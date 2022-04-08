@@ -25,7 +25,9 @@ class Parameter(Enum):
     EPS = "eps"
     TRANSFORMER_MODEL = "model"
     LAYERS = "LAYERS"
-
+    #--- Sanctify additions ---#
+    LAYER_MEAN = "layer_mean"
+    POOLING = "pooling" 
 
 TRAINING_PARAMETERS = [
     Parameter.LEARNING_RATE.value,
@@ -55,4 +57,9 @@ SEQUENCE_TAGGER_PARAMETERS = [
 TEXT_CLASSIFICATION_PARAMETERS = [
     Parameter.LAYERS.value,
     Parameter.TRANSFORMER_MODEL.value,
+    Parameter.LAYER_MEAN.value, # Sanctify additions
+    Parameter.POOLING.value, # Sanctify additions
 ]
+
+
+# :param batch_size: How many sentence to push through transformer at once. Set to 1 by default since transformer models tend to be huge.

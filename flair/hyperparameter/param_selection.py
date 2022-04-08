@@ -48,6 +48,7 @@ class ParamSelector(object):
         evaluation_metric: EvaluationMetric,
         training_runs: int,
         optimization_value: OptimizationValue,
+        load_dir: Union[str, Path],         # Sanctify additions 
     ):
         if type(base_path) is str:
             base_path = Path(base_path)
@@ -159,7 +160,7 @@ class ParamSelector(object):
                     v = ",".join([str(x) for x in v])
                 f.write(f"\t{k}: {str(v)}\n")
 
-
+'''
 class SequenceTaggerParamSelector(ParamSelector):
     def __init__(
         self,
@@ -201,7 +202,7 @@ class SequenceTaggerParamSelector(ParamSelector):
             **sequence_tagger_params,
         )
         return tagger
-
+    
 
 class TextClassifierParamSelector(ParamSelector):
     def __init__(
@@ -242,7 +243,7 @@ class TextClassifierParamSelector(ParamSelector):
         self.fine_tune = fine_tune
 
         self.label_dictionary = self.corpus.make_label_dictionary(self.label_type)
-
+    
     def _set_up_model(self, params: dict):
         text_classification_params = {key: params[key] for key in params if key in TEXT_CLASSIFICATION_PARAMETERS}
 
@@ -254,5 +255,72 @@ class TextClassifierParamSelector(ParamSelector):
             label_type=self.label_type,
             document_embeddings=document_embedding,
         )
+
+        return text_classifier
+    '''
+#----- Sanctify additions -----#
+class TextClassifierParamSelectorLoad(ParamSelector):
+    def __init__(
+        self,
+        corpus: Corpus,
+        label_type: str,
+        multi_label: bool,
+        base_path: Union[str, Path],
+        max_epochs: int = 50,
+        fine_tune: bool = True,
+        evaluation_metric: EvaluationMetric = EvaluationMetric.MICRO_F1_SCORE,
+        training_runs: int = 1,
+        optimization_value: OptimizationValue = OptimizationValue.DEV_LOSS,
+        load_dir: str = "",
+    ):
+        """
+        Text classifier hyperparameter selector that leverages TransformerDocumentEmbeddings
+        :param corpus: the corpus
+        :param label_type: string to identify the label type ('question_class', 'sentiment', etc.)
+        :param multi_label: true, if the dataset is multi label, false otherwise
+        :param base_path: the path to the result folder (results will be written to that folder)
+        :param max_epochs: number of epochs to perform on every evaluation run
+        :param fine_tune: if True, allows transformers to be fine-tuned during training
+        :param evaluation_metric: evaluation metric used during training
+        :param training_runs: number of training runs per evaluation run
+        :param optimization_value: value to optimize
+        :param load_dir: directory to load model from
+        """
+        super().__init__(
+            corpus,
+            base_path,
+            max_epochs,
+            evaluation_metric,
+            training_runs,
+            optimization_value,
+            load_dir,
+        )
+
+        self.multi_label = multi_label
+        self.label_type = label_type
+        self.fine_tune = fine_tune
+        self.load_dir = load_dir
+
+        if type(self.load_dir) is str:
+            self.load_dir = Path(self.load_dir)
+
+        self.label_dictionary = self.corpus.make_label_dictionary(self.label_type)
+
+    def _set_up_model(self, params: dict):
+        text_classification_params = {key: params[key] for key in params if key in TEXT_CLASSIFICATION_PARAMETERS}
+
+        document_embedding = TransformerDocumentEmbeddings(fine_tune=self.fine_tune, **text_classification_params)
+
+        if(self.load_dir):
+            print("Loading model ", str(self.load_dir))
+            text_classifier = TextClassifier.load(self.load_dir) 
+
+        else:
+            text_classifier: TextClassifier = TextClassifier(
+                label_dictionary=self.label_dictionary,
+                multi_label=self.multi_label,
+                label_type=self.label_type,
+                document_embeddings=document_embedding,
+            )
 
         return text_classifier
