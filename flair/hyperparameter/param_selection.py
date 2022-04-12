@@ -19,6 +19,7 @@ from flair.hyperparameter.parameter import (
 from flair.models import SequenceTagger, TextClassifier
 from flair.trainers import ModelTrainer
 from flair.training_utils import EvaluationMetric, init_output_file, log_line
+import torch
 
 log = logging.getLogger("flair")
 
@@ -97,6 +98,9 @@ class ParamSelector(object):
                 self.base_path,
                 max_epochs=self.max_epochs,
                 param_selection_mode=True,
+                num_workers=8,  # Sanctify additions 
+                monitor_train=True, # Sanctify additions 
+                main_evaluation_metric=("macro avg","f1-score"), # Sanctify additions 
                 **training_params,
             )
 
@@ -268,7 +272,7 @@ class TextClassifierParamSelectorLoad(ParamSelector):
         base_path: Union[str, Path],
         max_epochs: int = 50,
         fine_tune: bool = True,
-        evaluation_metric: EvaluationMetric = EvaluationMetric.MICRO_F1_SCORE,
+        evaluation_metric: EvaluationMetric = EvaluationMetric.MACRO_F1_SCORE,
         training_runs: int = 1,
         optimization_value: OptimizationValue = OptimizationValue.DEV_LOSS,
         load_dir: str = "",
@@ -301,7 +305,7 @@ class TextClassifierParamSelectorLoad(ParamSelector):
         self.fine_tune = fine_tune
         self.load_dir = load_dir
 
-        if type(self.load_dir) is str:
+        if (self.load_dir):
             self.load_dir = Path(self.load_dir)
 
         self.label_dictionary = self.corpus.make_label_dictionary(self.label_type)
@@ -316,6 +320,7 @@ class TextClassifierParamSelectorLoad(ParamSelector):
             text_classifier = TextClassifier.load(self.load_dir) 
 
         else:
+            print("Downloading model")
             text_classifier: TextClassifier = TextClassifier(
                 label_dictionary=self.label_dictionary,
                 multi_label=self.multi_label,

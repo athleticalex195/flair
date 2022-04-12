@@ -1,7 +1,8 @@
 from .param_selection import (
     SearchSpace,
-    SequenceTaggerParamSelector,
-    TextClassifierParamSelector,
+    TextClassifierParamSelectorLoad,    # Sanctify addons
+    #SequenceTaggerParamSelector,
+    #TextClassifierParamSelector,
 )
 from .parameter import (
     SEQUENCE_TAGGER_PARAMETERS,
@@ -15,7 +16,8 @@ __all__ = [
     "SEQUENCE_TAGGER_PARAMETERS",
     "TRAINING_PARAMETERS",
     "TEXT_CLASSIFICATION_PARAMETERS",
-    "SequenceTaggerParamSelector",
-    "TextClassifierParamSelector",
+    "TextClassifierParamSelectorLoad",
+    #"SequenceTaggerParamSelector",
+    #"TextClassifierParamSelector",
     "SearchSpace",
 ]
