@@ -24,10 +24,13 @@ class Parameter(Enum):
     BETAS = "betas"
     EPS = "eps"
     TRANSFORMER_MODEL = "model"
-    LAYERS = "LAYERS"
+    LAYERS = "layers"
     #--- Sanctify additions ---#
     LAYER_MEAN = "layer_mean"
-    POOLING = "pooling" 
+    POOLING = "cls_pooling"
+    WARMUP_FRACTION = "warmup_fraction",
+    SCHEDULER = "scheduler",
+]
 
 TRAINING_PARAMETERS = [
     Parameter.LEARNING_RATE.value,
@@ -43,6 +46,8 @@ TRAINING_PARAMETERS = [
     Parameter.AMSGRAD.value,
     Parameter.BETAS.value,
     Parameter.EPS.value,
+    Parameter.WARMUP_FRACTION.value, # Sanctify additions
+    Parameter.SCHEDULER.value,  # Sanctify additions
 ]
 SEQUENCE_TAGGER_PARAMETERS = [
     Parameter.EMBEDDINGS.value,
@@ -60,6 +65,3 @@ TEXT_CLASSIFICATION_PARAMETERS = [
     Parameter.LAYER_MEAN.value, # Sanctify additions
     Parameter.POOLING.value, # Sanctify additions
 ]
-
-
-# :param batch_size: How many sentence to push through transformer at once. Set to 1 by default since transformer models tend to be huge.
