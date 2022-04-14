@@ -5,7 +5,11 @@ from pathlib import Path
 from typing import Union
 
 import numpy as np
-from hyperopt import fmin, hp, tpe, atpe
+from hyperopt import fmin, hp, tpe
+from hyperopt.early_stop import no_progress_loss    # Sanctify additions
+from hyperopt import SparkTrials    # Sanctify additions
+
+import pyspark # Sanctify additions
 
 import flair.nn
 from flair.data import Corpus
@@ -148,7 +152,13 @@ class ParamSelector(object):
 
     def optimize(self, space: SearchSpace, max_evals=100):
         search_space = space.search_space
-        best = fmin(self._objective, search_space, algo=atpe.suggest, max_evals=max_evals)
+        
+        best = fmin(self._objective,
+        search_space, 
+        algo=tpe.suggest, 
+        max_evals=max_evals, 
+        trials=SparkTrials(parallelism=2), # Sanctify additions
+        )       
 
         log_line(log)
         log.info("Optimizing parameter configuration done.")

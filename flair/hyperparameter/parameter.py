@@ -28,9 +28,8 @@ class Parameter(Enum):
     #--- Sanctify additions ---#
     LAYER_MEAN = "layer_mean"
     POOLING = "cls_pooling"
-    WARMUP_FRACTION = "warmup_fraction",
-    SCHEDULER = "scheduler",
-]
+    WARMUP_FRACTION = "warmup_fraction"
+    SCHEDULER = "scheduler"
 
 TRAINING_PARAMETERS = [
     Parameter.LEARNING_RATE.value,
@@ -48,6 +47,7 @@ TRAINING_PARAMETERS = [
     Parameter.EPS.value,
     Parameter.WARMUP_FRACTION.value, # Sanctify additions
     Parameter.SCHEDULER.value,  # Sanctify additions
+
 ]
 SEQUENCE_TAGGER_PARAMETERS = [
     Parameter.EMBEDDINGS.value,
